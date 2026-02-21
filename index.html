@@ -4,66 +4,133 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cardápio Inteligente</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --primary-purple: #5e35b1; 
-            --dark-purple: #311b92;    
-            --light-purple: #ede7f6;   
-            --text-dark: #333333;
-            --text-light: #777777;
+            --primary-purple: #6200ea; 
+            --text-dark: #1a1a1a;
+            --text-light: #717171;
             --white: #ffffff;
+            --background: #ffffff;
+            --border-color: #f0f0f0;
             --whatsapp-green: #25d366;
+            --ifood-gray: #f7f7f7; 
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
-        body { background-color: #f8f9fa; color: var(--text-dark); padding-bottom: 80px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body { background-color: var(--background); color: var(--text-dark); padding-bottom: 90px; -webkit-font-smoothing: antialiased; }
 
         header {
-            background: linear-gradient(135deg, var(--dark-purple), var(--primary-purple));
-            color: var(--white); padding: 30px 20px; text-align: center;
-            border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background: var(--white);
+            padding: 24px 20px 16px; 
+            border-bottom: 1px solid var(--border-color);
         }
-        header h1 { font-size: 1.5rem; margin-bottom: 5px; }
-        header p { font-size: 0.9rem; opacity: 0.9; font-style: italic; }
+        header h1 { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; color: var(--text-dark); }
+        header p { font-size: 0.85rem; font-weight: 400; color: var(--text-light); }
 
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .section-title { color: var(--dark-purple); font-size: 1.2rem; margin-bottom: 15px; }
+        .container { max-width: 600px; margin: 0 auto; padding: 16px 20px; }
+        
+        .section-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 12px; color: var(--text-dark); }
 
-        /* --- NOVO: Estilo das Categorias --- */
+        /* --- BOTÕES MAIS FINOS E COMPACTOS --- */
         .categories-container {
-            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 20px;
-            scrollbar-width: none; /* Esconde barra de rolagem no Firefox */
+            display: grid;
+            grid-template-rows: repeat(2, 1fr); 
+            grid-auto-columns: calc(50% - 4px); /* Ajuste fino na largura */
+            grid-auto-flow: column; 
+            gap: 8px; /* Menos espaço entre os botões */
+            overflow-x: auto; 
+            padding-bottom: 8px; /* Menos espaço embaixo da rolagem */
+            margin-bottom: 12px; /* Puxa os pratos mais para cima */
+            scrollbar-width: none; 
+            scroll-snap-type: x mandatory; 
         }
-        .categories-container::-webkit-scrollbar { display: none; } /* Esconde barra no Chrome */
+        .categories-container::-webkit-scrollbar { display: none; } 
         
         .category-btn {
-            background-color: var(--white); color: var(--text-dark);
-            border: 1px solid #ddd; padding: 8px 16px; border-radius: 20px;
-            white-space: nowrap; cursor: pointer; font-weight: bold; transition: 0.3s;
+            scroll-snap-align: start; 
+            background-color: var(--ifood-gray); 
+            color: var(--text-dark);
+            border: 2px solid transparent; 
+            padding: 6px 8px; /* AQUI ESTÁ A MÁGICA: Reduziu a altura drasticamente */
+            border-radius: 10px; /* Borda um pouco mais fechada para acompanhar o novo formato */
+            white-space: nowrap; 
+            cursor: pointer; 
+            font-weight: 500; 
+            font-size: 0.85rem; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 6px; /* Ícone um pouquinho mais perto do texto */
+            transition: all 0.2s ease;
+            width: 100%; 
         }
+        
+        .category-icon {
+            font-size: 1.1rem; /* Ícone levemente menor para caber no botão fino */
+            display: flex; align-items: center; justify-content: center;
+        }
+
         .category-btn.active {
-            background-color: var(--primary-purple); color: var(--white); border-color: var(--primary-purple);
+            background-color: #f5f0ff; 
+            color: var(--primary-purple); 
+            border-color: var(--primary-purple);
+            font-weight: 600;
         }
-        /* ----------------------------------- */
+        /* --------------------------------------------------------- */
 
         .product-card {
-            background-color: var(--white); border-radius: 12px; display: flex; overflow: hidden;
-            margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid var(--primary-purple);
+            background-color: var(--white); display: flex; align-items: stretch;
+            margin-bottom: 0; padding: 16px 0;
+            border-bottom: 1px solid var(--border-color);
+            animation: fadeInUp 0.4s ease backwards; 
         }
-        /* Ajuste para imagens ficarem perfeitas */
-        .product-img { width: 110px; background-color: var(--light-purple); display: flex; align-items: center; justify-content: center; font-size: 3rem; padding: 0; }
+        .product-card:last-child { border-bottom: none; }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .product-img { 
+            width: 85px; height: 85px; border-radius: 8px; overflow: hidden; 
+            background-color: #f9f9f9; display: flex; align-items: center; justify-content: center; 
+            flex-shrink: 0; margin-right: 16px;
+        }
         .product-img img { width: 100%; height: 100%; object-fit: cover; }
         
-        .product-info { padding: 12px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-        .product-title { font-size: 1.1rem; font-weight: bold; color: var(--dark-purple); margin-bottom: 4px; }
-        .product-desc { font-size: 0.8rem; color: var(--text-light); line-height: 1.3; margin-bottom: 8px; }
+        .product-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        
+        .product-title { font-size: 0.95rem; font-weight: 600; color: var(--text-dark); margin-bottom: 4px; }
+        .product-desc { font-size: 0.8rem; color: var(--text-light); line-height: 1.3; font-weight: 400; margin-bottom: 10px; }
+        
         .product-footer { display: flex; justify-content: space-between; align-items: center; }
-        .product-price { font-weight: bold; color: var(--primary-purple); font-size: 1.1rem; }
+        .product-price { font-weight: 600; color: var(--text-dark); font-size: 0.95rem; }
         
-        .add-btn { background-color: var(--light-purple); color: var(--primary-purple); border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 1.2rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        
-        .floating-cart { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background-color: var(--whatsapp-green); color: var(--white); border: none; border-radius: 30px; padding: 15px 20px; font-size: 1rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4); cursor: pointer; z-index: 1000; }
+        .qty-control { display: flex; align-items: center; gap: 8px; }
+        .qty-btn {
+            background-color: var(--white); color: var(--primary-purple); 
+            border: 1px solid var(--border-color); width: 26px; height: 26px; border-radius: 4px; 
+            font-size: 1rem; font-weight: 500; cursor: pointer; display: flex; 
+            align-items: center; justify-content: center; transition: background 0.2s;
+        }
+        .qty-btn:active { background-color: #f5f0ff; border-color: var(--primary-purple); }
+        .qty-display { font-weight: 500; color: var(--text-dark); width: 16px; text-align: center; font-size: 0.85rem; }
+
+        .floating-cart { 
+            position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); 
+            width: calc(100% - 32px); max-width: 400px; background-color: var(--primary-purple); 
+            color: var(--white); border: none; border-radius: 8px; padding: 14px 20px; 
+            font-size: 0.95rem; font-weight: 600; display: flex; justify-content: space-between; 
+            align-items: center; box-shadow: 0 4px 12px rgba(98, 0, 234, 0.2); 
+            cursor: pointer; z-index: 1000; transition: transform 0.1s;
+        }
+        .floating-cart:active { transform: translateX(-50%) scale(0.98); }
     </style>
 </head>
 <body>
@@ -75,13 +142,12 @@
 
     <div class="container">
         <div class="categories-container" id="filtros-categoria"></div>
-
         <h2 class="section-title" id="titulo-secao">Todos os Pratos</h2>
         <div id="vitrine-produtos"></div>
     </div>
 
     <button class="floating-cart" onclick="fecharPedido()">
-        <span id="texto-carrinho">🛒 Sacola Vazia</span>
+        <span id="texto-carrinho">Sacola Vazia</span>
         <span id="total-carrinho">R$ 0,00</span>
     </button>
 
@@ -92,63 +158,68 @@
         const lojaId = urlParams.get('loja') || 'cantina'; 
         const lojaAtual = restaurantes.find(r => r.id === lojaId);
         
-        let carrinho = [];
-        let total = 0;
+        let carrinho = {}; 
         const formatarMoeda = (valor) => valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+        function obterIcone(categoria) {
+            const icones = {
+                "Todos": "🍽️",
+                "Pizzas": "🍕",
+                "Massas": "🍝",
+                "Bebidas": "🥤",
+                "Hambúrgueres": "🍔",
+                "Sobremesas": "🍰",
+                "Porções": "🍟"
+            };
+            return icones[categoria] || "🏷️"; 
+        }
 
         if (lojaAtual) {
             document.getElementById('nome-loja').innerText = lojaAtual.nome;
             document.getElementById('slogan-loja').innerText = lojaAtual.slogan;
 
-            // --- NOVO: Lógica das Categorias ---
-            // Pega todas as categorias sem repetir e adiciona "Todos" no começo
             const categoriasUnicas = ["Todos", ...new Set(lojaAtual.cardapio.map(prato => prato.categoria))];
             const containerFiltros = document.getElementById('filtros-categoria');
 
-            // Cria os botões na tela
             categoriasUnicas.forEach(cat => {
                 const btn = document.createElement('button');
-                // O botão "Todos" já começa ativado (roxo)
                 btn.className = 'category-btn' + (cat === 'Todos' ? ' active' : '');
-                btn.innerText = cat;
+                
+                const icone = obterIcone(cat);
+                btn.innerHTML = `<span class="category-icon">${icone}</span><span>${cat}</span>`;
+                
                 btn.onclick = () => filtrarCardapio(cat, btn);
                 containerFiltros.appendChild(btn);
             });
 
-            // Motor de filtrar
             function filtrarCardapio(categoriaSelecionada, botaoClicado) {
-                // Remove a cor roxa de todos os botões e coloca só no que foi clicado
                 document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
                 botaoClicado.classList.add('active');
 
-                // Atualiza o título
                 document.getElementById('titulo-secao').innerText = categoriaSelecionada === 'Todos' ? 'Todos os Pratos' : categoriaSelecionada;
 
-                // Filtra os dados
                 let pratosFiltrados = lojaAtual.cardapio;
                 if (categoriaSelecionada !== 'Todos') {
                     pratosFiltrados = lojaAtual.cardapio.filter(p => p.categoria === categoriaSelecionada);
                 }
                 
-                // Desenha a tela novamente
                 renderizarVitrine(pratosFiltrados);
             }
 
-            // --- Fim da Nova Lógica ---
-
-            // Motor que desenha a tela (agora virou uma função reutilizável)
             function renderizarVitrine(itens) {
                 const vitrine = document.getElementById('vitrine-produtos');
-                vitrine.innerHTML = ''; // Limpa a tela antes de desenhar
+                vitrine.innerHTML = ''; 
                 
-                itens.forEach(prato => {
-                    // Verifica se a imagem é um link (img/...) ou um emoji provisório
+                itens.forEach((prato, index) => {
                     const imagemHTML = prato.imagem.includes('/') 
                         ? `<img src="${prato.imagem}" alt="${prato.nome}">` 
                         : prato.imagem;
 
+                    const qtdAtual = carrinho[prato.id] ? carrinho[prato.id].quantidade : 0;
+                    const animDelay = index * 0.05;
+
                     const cardHTML = `
-                        <div class="product-card">
+                        <div class="product-card" style="animation-delay: ${animDelay}s">
                             <div class="product-img">${imagemHTML}</div>
                             <div class="product-info">
                                 <div>
@@ -157,7 +228,13 @@
                                 </div>
                                 <div class="product-footer">
                                     <span class="product-price">${formatarMoeda(prato.preco)}</span>
-                                    <button class="add-btn" onclick="adicionarItem('${prato.nome}', ${prato.preco}, this)">+</button>
+                                    
+                                    <div class="qty-control">
+                                        <button class="qty-btn" onclick="alterarQuantidade(${prato.id}, -1)">-</button>
+                                        <span class="qty-display" id="qty-${prato.id}">${qtdAtual}</span>
+                                        <button class="qty-btn" onclick="alterarQuantidade(${prato.id}, 1)">+</button>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -166,38 +243,64 @@
                 });
             }
 
-            // Roda pela primeira vez mostrando "Todos"
             renderizarVitrine(lojaAtual.cardapio);
 
         } else {
-            document.body.innerHTML = "<h1 style='text-align:center; padding: 50px;'>Restaurante não encontrado.</h1>";
+            document.body.innerHTML = "<div style='padding: 40px 20px; text-align: center;'><h2 style='font-size: 1.1rem; color: #1a1a1a;'>Restaurante não encontrado.</h2></div>";
         }
 
-        // --- Código do Carrinho (Mantido igual) ---
-        function adicionarItem(nome, preco, botao) {
-            carrinho.push({ nome, preco });
-            total += preco;
-            document.getElementById('total-carrinho').innerText = formatarMoeda(total);
-            document.getElementById('texto-carrinho').innerText = `🛒 Fechar Pedido (${carrinho.length})`;
+        function alterarQuantidade(id, variacao) {
+            if (!carrinho[id]) {
+                if (variacao > 0) {
+                    const prato = lojaAtual.cardapio.find(p => p.id === id);
+                    carrinho[id] = { nome: prato.nome, preco: prato.preco, quantidade: 1 };
+                }
+            } else {
+                carrinho[id].quantidade += variacao;
+                if (carrinho[id].quantidade <= 0) {
+                    delete carrinho[id];
+                }
+            }
 
-            botao.innerText = "✓";
-            botao.style.backgroundColor = "var(--whatsapp-green)";
-            botao.style.color = "white";
-            setTimeout(() => {
-                botao.innerText = "+";
-                botao.style.backgroundColor = "var(--light-purple)";
-                botao.style.color = "var(--primary-purple)";
-            }, 800);
+            const visorQtd = document.getElementById(`qty-${id}`);
+            if (visorQtd) {
+                visorQtd.innerText = carrinho[id] ? carrinho[id].quantidade : 0;
+            }
+
+            atualizarCarrinhoUI();
+        }
+
+        function atualizarCarrinhoUI() {
+            let total = 0;
+            let totalItens = 0;
+
+            for (let id in carrinho) {
+                total += carrinho[id].preco * carrinho[id].quantidade;
+                totalItens += carrinho[id].quantidade;
+            }
+
+            document.getElementById('total-carrinho').innerText = formatarMoeda(total);
+            document.getElementById('texto-carrinho').innerText = totalItens > 0 ? `Ver Sacola (${totalItens})` : `Sacola Vazia`;
         }
 
         function fecharPedido() {
-            if (carrinho.length === 0) {
+            if (Object.keys(carrinho).length === 0) {
                 alert("Selecione algum item primeiro!"); return;
             }
+
             let msg = `Olá! Gostaria de fazer o seguinte pedido na ${lojaAtual.nome}:\n\n`;
-            carrinho.forEach(item => { msg += `▫️ ${item.nome} - ${formatarMoeda(item.preco)}\n`; });
-            msg += `\n*Total: ${formatarMoeda(total)}*\n\n`;
+            let totalPedido = 0;
+
+            for (let id in carrinho) {
+                const item = carrinho[id];
+                const subtotalItem = item.preco * item.quantidade;
+                totalPedido += subtotalItem;
+                msg += `▫️ ${item.quantidade}x ${item.nome} - ${formatarMoeda(subtotalItem)}\n`;
+            }
+
+            msg += `\n*Total: ${formatarMoeda(totalPedido)}*\n\n`;
             msg += "📍 Endereço para entrega:\n💳 Forma de pagamento:\n";
+            
             const url = `https://wa.me/${lojaAtual.whatsapp}?text=${encodeURIComponent(msg)}`;
             window.open(url, '_blank');
         }
