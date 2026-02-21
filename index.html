@@ -3,299 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cardápio Inteligente | Protótipo</title>
+    <title>Cardápio Inteligente</title>
     <style>
-        /* Variáveis de Cor - Foco no Roxo Profundo e Acentos */
         :root {
-            --primary-purple: #5e35b1; /* Roxo principal vibrante */
-            --dark-purple: #311b92;    /* Roxo escuro para cabeçalhos */
-            --light-purple: #ede7f6;   /* Fundo suave */
+            --primary-purple: #5e35b1; 
+            --dark-purple: #311b92;    
+            --light-purple: #ede7f6;   
             --text-dark: #333333;
             --text-light: #777777;
             --white: #ffffff;
             --whatsapp-green: #25d366;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
+        body { background-color: #f8f9fa; color: var(--text-dark); padding-bottom: 80px; }
 
-        body {
-            background-color: #f8f9fa;
-            color: var(--text-dark);
-            padding-bottom: 80px; /* Espaço para o botão fixo do WhatsApp */
-        }
-
-        /* Cabeçalho do Restaurante */
         header {
             background: linear-gradient(135deg, var(--dark-purple), var(--primary-purple));
-            color: var(--white);
-            padding: 30px 20px;
-            text-align: center;
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
+            color: var(--white); padding: 30px 20px; text-align: center;
+            border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
+        header h1 { font-size: 1.5rem; margin-bottom: 5px; }
+        header p { font-size: 0.9rem; opacity: 0.9; font-style: italic; }
 
-        header h1 {
-            font-size: 1.5rem;
-            margin-bottom: 5px;
-            letter-spacing: 1px;
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .section-title { color: var(--dark-purple); font-size: 1.2rem; margin-bottom: 15px; }
+
+        /* --- NOVO: Estilo das Categorias --- */
+        .categories-container {
+            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 20px;
+            scrollbar-width: none; /* Esconde barra de rolagem no Firefox */
         }
-
-        header p {
-            font-size: 0.9rem;
-            opacity: 0.9;
-            font-style: italic; /* Onde entra o slogan/essência */
+        .categories-container::-webkit-scrollbar { display: none; } /* Esconde barra no Chrome */
+        
+        .category-btn {
+            background-color: var(--white); color: var(--text-dark);
+            border: 1px solid #ddd; padding: 8px 16px; border-radius: 20px;
+            white-space: nowrap; cursor: pointer; font-weight: bold; transition: 0.3s;
         }
-
-        /* Container Principal */
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
+        .category-btn.active {
+            background-color: var(--primary-purple); color: var(--white); border-color: var(--primary-purple);
         }
+        /* ----------------------------------- */
 
-        .section-title {
-            color: var(--dark-purple);
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            border-bottom: 2px solid var(--light-purple);
-            padding-bottom: 5px;
-        }
-
-        /* Cartão de Produto (Design Mobile Moderno) */
         .product-card {
-            background-color: var(--white);
-            border-radius: 12px;
-            display: flex;
-            overflow: hidden;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            transition: transform 0.2s;
-            border-left: 4px solid var(--primary-purple);
+            background-color: var(--white); border-radius: 12px; display: flex; overflow: hidden;
+            margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid var(--primary-purple);
         }
-
-        .product-card:active {
-            transform: scale(0.98);
-        }
-
-        /* Espaço para a foto gerada por IA */
-        .product-img {
-            width: 110px;
-            background-color: var(--light-purple);
-            /* Aqui entrará a imagem real depois com background-image ou tag img */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary-purple);
-            font-size: 0.8rem;
-            text-align: center;
-            padding: 10px;
-        }
-
-        .product-info {
-            padding: 12px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .product-title {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: var(--dark-purple);
-            margin-bottom: 4px;
-        }
-
-        .product-desc {
-            font-size: 0.8rem;
-            color: var(--text-light);
-            line-height: 1.3;
-            margin-bottom: 8px;
-        }
-
-        .product-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .product-price {
-            font-weight: bold;
-            color: var(--primary-purple);
-            font-size: 1.1rem;
-        }
-
-        .add-btn {
-            background-color: var(--light-purple);
-            color: var(--primary-purple);
-            border: none;
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Botão Fixo de Checkout (WhatsApp) */
-        .floating-cart {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 400px;
-            background-color: var(--whatsapp-green);
-            color: var(--white);
-            border: none;
-            border-radius: 30px;
-            padding: 15px 20px;
-            font-size: 1rem;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
-            cursor: pointer;
-            z-index: 1000;
-        }
+        /* Ajuste para imagens ficarem perfeitas */
+        .product-img { width: 110px; background-color: var(--light-purple); display: flex; align-items: center; justify-content: center; font-size: 3rem; padding: 0; }
+        .product-img img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .product-info { padding: 12px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .product-title { font-size: 1.1rem; font-weight: bold; color: var(--dark-purple); margin-bottom: 4px; }
+        .product-desc { font-size: 0.8rem; color: var(--text-light); line-height: 1.3; margin-bottom: 8px; }
+        .product-footer { display: flex; justify-content: space-between; align-items: center; }
+        .product-price { font-weight: bold; color: var(--primary-purple); font-size: 1.1rem; }
+        
+        .add-btn { background-color: var(--light-purple); color: var(--primary-purple); border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 1.2rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        
+        .floating-cart { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background-color: var(--whatsapp-green); color: var(--white); border: none; border-radius: 30px; padding: 15px 20px; font-size: 1rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4); cursor: pointer; z-index: 1000; }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>Cantina Exemplo</h1>
-        <p>A tradição da nossa terra servida na sua mesa.</p>
+        <h1 id="nome-loja">Carregando...</h1>
+        <p id="slogan-loja"></p>
     </header>
 
     <div class="container">
-        <h2 class="section-title">Especialidades</h2>
+        <div class="categories-container" id="filtros-categoria"></div>
 
-        <div class="product-card">
-            <div class="product-img">
-                [Foto IA do Prato]
-            </div>
-            <div class="product-info">
-                <div>
-                    <h3 class="product-title">Talharim "Santa Bárbara"</h3>
-                    <p class="product-desc">Massa artesanal ao molho de vinho tinto da colônia com lascas de carne bovina selecionada.</p>
-                </div>
-                <div class="product-footer">
-                    <span class="product-price">R$ 45,90</span>
-                    <button class="add-btn">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <div class="product-img">
-                [Foto IA da Pizza]
-            </div>
-            <div class="product-info">
-                <div>
-                    <h3 class="product-title">Pizza "Essência"</h3>
-                    <p class="product-desc">Frango temperado, Catupiry original, milho e um toque de azeite de ervas locais.</p>
-                </div>
-                <div class="product-footer">
-                    <span class="product-price">R$ 65,00</span>
-                    <button class="add-btn">+</button>
-                </div>
-            </div>
-        </div>
-
+        <h2 class="section-title" id="titulo-secao">Todos os Pratos</h2>
+        <div id="vitrine-produtos"></div>
     </div>
 
-    <button class="floating-cart">
-        <span>🛒 Ver Pedido</span>
-        <span>R$ 0,00</span>
+    <button class="floating-cart" onclick="fecharPedido()">
+        <span id="texto-carrinho">🛒 Sacola Vazia</span>
+        <span id="total-carrinho">R$ 0,00</span>
     </button>
-<script>
-        // Array para guardar os itens do pedido
+
+    <script src="dados.js"></script>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const lojaId = urlParams.get('loja') || 'cantina'; 
+        const lojaAtual = restaurantes.find(r => r.id === lojaId);
+        
         let carrinho = [];
         let total = 0;
+        const formatarMoeda = (valor) => valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-        // ATENÇÃO: Coloque o seu número de WhatsApp aqui para testar (com DDI 55 e DDD 42)
-        const numeroWhatsApp = "5542999999999"; 
+        if (lojaAtual) {
+            document.getElementById('nome-loja').innerText = lojaAtual.nome;
+            document.getElementById('slogan-loja').innerText = lojaAtual.slogan;
 
-        // Seleciona os elementos da tela
-        const botoesAdicionar = document.querySelectorAll('.add-btn');
-        const botaoCheckout = document.querySelector('.floating-cart');
-        const spanItens = botaoCheckout.querySelectorAll('span')[0];
-        const spanTotal = botaoCheckout.querySelectorAll('span')[1];
+            // --- NOVO: Lógica das Categorias ---
+            // Pega todas as categorias sem repetir e adiciona "Todos" no começo
+            const categoriasUnicas = ["Todos", ...new Set(lojaAtual.cardapio.map(prato => prato.categoria))];
+            const containerFiltros = document.getElementById('filtros-categoria');
 
-        // Função rápida para formatar o dinheiro para o padrão brasileiro
-        const formatarMoeda = (valor) => {
-            return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-        };
-
-        // Escuta o clique em cada botão "+"
-        botoesAdicionar.forEach(botao => {
-            botao.addEventListener('click', (e) => {
-                // Descobre de qual produto estamos falando
-                const card = e.target.closest('.product-card');
-                const nomeProduto = card.querySelector('.product-title').innerText;
-                const precoTexto = card.querySelector('.product-price').innerText;
-                
-                // Converte o texto "R$ 45,90" para um número matemático (45.90)
-                const precoNumero = parseFloat(precoTexto.replace('R$ ', '').replace(',', '.'));
-
-                // Guarda no carrinho e soma
-                carrinho.push({ nome: nomeProduto, preco: precoNumero });
-                total += precoNumero;
-
-                // Atualiza o visual do botão verde lá embaixo
-                spanTotal.innerText = formatarMoeda(total);
-                spanItens.innerText = `🛒 Fechar Pedido (${carrinho.length})`;
-
-                // Um charminho de interface: o botão pisca verde indicando que deu certo
-                e.target.innerText = "✓";
-                e.target.style.backgroundColor = "var(--whatsapp-green)";
-                e.target.style.color = "white";
-                setTimeout(() => {
-                    e.target.innerText = "+";
-                    e.target.style.backgroundColor = "var(--light-purple)";
-                    e.target.style.color = "var(--primary-purple)";
-                }, 800);
+            // Cria os botões na tela
+            categoriasUnicas.forEach(cat => {
+                const btn = document.createElement('button');
+                // O botão "Todos" já começa ativado (roxo)
+                btn.className = 'category-btn' + (cat === 'Todos' ? ' active' : '');
+                btn.innerText = cat;
+                btn.onclick = () => filtrarCardapio(cat, btn);
+                containerFiltros.appendChild(btn);
             });
-        });
 
-        // O momento mágico: Enviar para o WhatsApp
-        botaoCheckout.addEventListener('click', () => {
-            if (carrinho.length === 0) {
-                alert("Selecione algum prato para provar a nossa essência primeiro!");
-                return;
+            // Motor de filtrar
+            function filtrarCardapio(categoriaSelecionada, botaoClicado) {
+                // Remove a cor roxa de todos os botões e coloca só no que foi clicado
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                botaoClicado.classList.add('active');
+
+                // Atualiza o título
+                document.getElementById('titulo-secao').innerText = categoriaSelecionada === 'Todos' ? 'Todos os Pratos' : categoriaSelecionada;
+
+                // Filtra os dados
+                let pratosFiltrados = lojaAtual.cardapio;
+                if (categoriaSelecionada !== 'Todos') {
+                    pratosFiltrados = lojaAtual.cardapio.filter(p => p.categoria === categoriaSelecionada);
+                }
+                
+                // Desenha a tela novamente
+                renderizarVitrine(pratosFiltrados);
             }
 
-            // Monta o cabeçalho da mensagem
-            let mensagem = "Olá! Gostaria de fazer o seguinte pedido pelo Cardápio Inteligente:\n\n";
-            
-            // Lista os itens que a pessoa clicou
-            carrinho.forEach((item, index) => {
-                mensagem += `▫️ ${item.nome} - ${formatarMoeda(item.preco)}\n`;
-            });
+            // --- Fim da Nova Lógica ---
 
-            // Fecha a conta e pede os dados finais
-            mensagem += `\n*Total da Compra: ${formatarMoeda(total)}*\n\n`;
-            mensagem += "📍 Endereço para entrega em Bituruna:\n";
-            mensagem += "💳 Forma de pagamento (Dinheiro, Pix ou Cartão):\n";
+            // Motor que desenha a tela (agora virou uma função reutilizável)
+            function renderizarVitrine(itens) {
+                const vitrine = document.getElementById('vitrine-produtos');
+                vitrine.innerHTML = ''; // Limpa a tela antes de desenhar
+                
+                itens.forEach(prato => {
+                    // Verifica se a imagem é um link (img/...) ou um emoji provisório
+                    const imagemHTML = prato.imagem.includes('/') 
+                        ? `<img src="${prato.imagem}" alt="${prato.nome}">` 
+                        : prato.imagem;
 
-            // Codifica a mensagem para o formato que o WhatsApp entende e cria o link
-            const url = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensagem)}`;
-            
-            // Abre o WhatsApp direto no celular ou PC do cliente
+                    const cardHTML = `
+                        <div class="product-card">
+                            <div class="product-img">${imagemHTML}</div>
+                            <div class="product-info">
+                                <div>
+                                    <h3 class="product-title">${prato.nome}</h3>
+                                    <p class="product-desc">${prato.descricao}</p>
+                                </div>
+                                <div class="product-footer">
+                                    <span class="product-price">${formatarMoeda(prato.preco)}</span>
+                                    <button class="add-btn" onclick="adicionarItem('${prato.nome}', ${prato.preco}, this)">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    vitrine.innerHTML += cardHTML;
+                });
+            }
+
+            // Roda pela primeira vez mostrando "Todos"
+            renderizarVitrine(lojaAtual.cardapio);
+
+        } else {
+            document.body.innerHTML = "<h1 style='text-align:center; padding: 50px;'>Restaurante não encontrado.</h1>";
+        }
+
+        // --- Código do Carrinho (Mantido igual) ---
+        function adicionarItem(nome, preco, botao) {
+            carrinho.push({ nome, preco });
+            total += preco;
+            document.getElementById('total-carrinho').innerText = formatarMoeda(total);
+            document.getElementById('texto-carrinho').innerText = `🛒 Fechar Pedido (${carrinho.length})`;
+
+            botao.innerText = "✓";
+            botao.style.backgroundColor = "var(--whatsapp-green)";
+            botao.style.color = "white";
+            setTimeout(() => {
+                botao.innerText = "+";
+                botao.style.backgroundColor = "var(--light-purple)";
+                botao.style.color = "var(--primary-purple)";
+            }, 800);
+        }
+
+        function fecharPedido() {
+            if (carrinho.length === 0) {
+                alert("Selecione algum item primeiro!"); return;
+            }
+            let msg = `Olá! Gostaria de fazer o seguinte pedido na ${lojaAtual.nome}:\n\n`;
+            carrinho.forEach(item => { msg += `▫️ ${item.nome} - ${formatarMoeda(item.preco)}\n`; });
+            msg += `\n*Total: ${formatarMoeda(total)}*\n\n`;
+            msg += "📍 Endereço para entrega:\n💳 Forma de pagamento:\n";
+            const url = `https://wa.me/${lojaAtual.whatsapp}?text=${encodeURIComponent(msg)}`;
             window.open(url, '_blank');
-        });
+        }
     </script>
-</body>
-</html>
 </body>
 </html>
