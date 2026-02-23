@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Mangiare</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-purple: #6200ea;
+            --bg-color: #f4f6f8;
+            --white: #ffffff;
+            --text-dark: #1a1a1a;
+            --text-light: #717171;
+            --border: #e0e0e0;
+            --danger: #ff4757;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body { background-color: var(--bg-color); color: var(--text-dark); display: flex; min-height: 100vh; }
+
+        .sidebar {
+            width: 250px; background-color: var(--white); border-right: 1px solid var(--border);
+            padding: 24px 20px; display: flex; flex-direction: column;
+        }
+        .brand { font-size: 1.2rem; font-weight: 700; color: var(--primary-purple); margin-bottom: 40px; }
+        .nav-item {
+            padding: 12px 16px; margin-bottom: 8px; border-radius: 8px;
+            color: var(--text-light); font-weight: 500; cursor: pointer; transition: 0.2s;
+        }
+        .nav-item.active { background-color: #f5f0ff; color: var(--primary-purple); font-weight: 600; }
+
+        .main-content { flex: 1; padding: 40px; overflow-y: auto; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header-top h1 { font-size: 1.5rem; }
+
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+        .panel { background-color: var(--white); border-radius: 12px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); border: 1px solid var(--border); }
+        .panel h2 { font-size: 1.1rem; margin-bottom: 20px; color: var(--text-dark); border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-light); }
+        
+        /* Novo estilo para o input de arquivo ficar bonitinho */
+        .form-control { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; transition: 0.2s; background: var(--white); }
+        .form-control[type="file"] { padding: 8px; font-size: 0.85rem; color: var(--text-light); cursor: pointer; }
+        .form-control[type="file"]::file-selector-button { background-color: #f0f0f0; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 600; color: var(--text-dark); cursor: pointer; margin-right: 10px; }
+        
+        .form-control:focus { outline: none; border-color: var(--primary-purple); box-shadow: 0 0 0 3px rgba(98,0,234,0.1); }
+        .form-hint { font-size: 0.75rem; color: #a0a0a0; margin-top: 4px; display: block; }
+        .upload-status { font-size: 0.85rem; color: var(--primary-purple); font-weight: 600; margin-top: 8px; display: none; }
+
+        .btn { padding: 12px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; transition: 0.2s; }
+        .btn-primary { background-color: var(--primary-purple); color: var(--white); }
+        .btn-primary:disabled { background-color: #b39ddb; cursor: not-allowed; }
+
+        .product-list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+        .product-list-item:last-child { border-bottom: none; }
+        .prod-info-wrapper { display: flex; align-items: center; gap: 12px; }
+        .mini-thumb { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .prod-info strong { display: block; font-size: 0.95rem; }
+        .prod-info span { font-size: 0.8rem; color: var(--text-light); }
+        
+        .btn-delete { background: none; border: none; color: var(--danger); cursor: pointer; font-weight: 500; padding: 6px; border-radius: 4px; }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); padding: 16px; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .main-content { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="brand">1bu Tech</div>
+        <div class="nav-item active">Cardápio</div>
+        <div class="nav-item">Configurações</div>
+    </aside>
+
+    <main class="main-content">
+        <div class="header-top">
+            <h1>Gestão de Pratos</h1>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="panel">
+                <h2>Adicionar Novo Prato</h2>
+                <form id="form-produto">
+                    <div class="form-group">
+                        <label>Nome do Prato</label>
+                        <input type="text" id="nome" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Categoria</label>
+                        <select id="categoria" class="form-control" required>
+                            <option value="Pizzas">Pizzas</option>
+                            <option value="Massas">Massas</option>
+                            <option value="Hambúrgueres">Hambúrgueres</option>
+                            <option value="Bebidas">Bebidas</option>
+                            <option value="Sobremesas">Sobremesas</option>
+                            <option value="Porções">Porções</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Preço (R$)</label>
+                        <input type="number" step="0.01" id="preco" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Foto do Prato (Opcional)</label>
+                        <input type="file" id="imagem-file" class="form-control" accept="image/*">
+                        <span class="form-hint">Tire uma foto ou escolha da galeria.</span>
+                        <div id="status-upload" class="upload-status">Fazendo upload da foto... aguarde.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Descrição Persuasiva</label>
+                        <textarea id="descricao" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" id="btn-salvar" class="btn btn-primary">Salvar no Cardápio</button>
+                </form>
+            </div>
+
+            <div class="panel">
+                <h2>Pratos Ativos na Nuvem</h2>
+                <div id="lista-produtos">
+                    <p style="color: var(--text-light); font-size: 0.9rem;">Carregando cardápio...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        // Importando a ferramenta de enviar fotos do Google
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAB8wxPDhBhiX39dye_KvdapHUsDspbLsk",
+            authDomain: "mangiare-79f67.firebaseapp.com",
+            projectId: "mangiare-79f67",
+            storageBucket: "mangiare-79f67.firebasestorage.app",
+            messagingSenderId: "942988586703",
+            appId: "1:942988586703:web:b0a1ac8f0a9532e74e91ba",
+            measurementId: "G-RR7J7ENMWZ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app); // Ligando o Google Drive
+        const colecaoPratos = collection(db, "pratos_cantina");
+
+        const form = document.getElementById('form-produto');
+        const btnSalvar = document.getElementById('btn-salvar');
+        const statusUpload = document.getElementById('status-upload');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+            
+            btnSalvar.innerText = "Processando...";
+            btnSalvar.disabled = true;
+            
+            let urlImagemPronta = "";
+            const campoArquivo = document.getElementById('imagem-file');
+            const arquivoFoto = campoArquivo.files[0]; // Pega o arquivo que a pessoa selecionou
+
+            try {
+                // SE A PESSOA COLOCOU UMA FOTO, FAZ O UPLOAD PRIMEIRO
+                if (arquivoFoto) {
+                    statusUpload.style.display = "block"; // Mostra mensagem de "aguarde"
+                    
+                    // Cria um nome único pra foto pra não misturar (ex: 1623490_pizza.jpg)
+                    const nomeUnico = Date.now() + "_" + arquivoFoto.name;
+                    // Diz onde salvar no Firebase (pasta 'fotos_pratos')
+                    const referenciaPasta = ref(storage, 'fotos_pratos/' + nomeUnico);
+                    
+                    // Envia o arquivo
+                    await uploadBytes(referenciaPasta, arquivoFoto);
+                    // Pega o link gerado pelo Google
+                    urlImagemPronta = await getDownloadURL(referenciaPasta);
+                }
+
+                // DEPOIS DO UPLOAD (ou se não teve foto), SALVA OS DADOS NO BANCO
+                await addDoc(colecaoPratos, {
+                    nome: document.getElementById('nome').value,
+                    categoria: document.getElementById('categoria').value,
+                    preco: parseFloat(document.getElementById('preco').value),
+                    descricao: document.getElementById('descricao').value,
+                    imagem: urlImagemPronta, // Salva o link oficial gerado pelo Firebase
+                    dataCriacao: serverTimestamp() 
+                });
+
+                form.reset();
+                statusUpload.style.display = "none";
+            } catch (error) {
+                console.error("Erro ao salvar: ", error);
+                alert("Erro ao salvar prato. Você ativou o Storage no painel do Firebase?");
+            } finally {
+                btnSalvar.innerText = "Salvar no Cardápio";
+                btnSalvar.disabled = false;
+            }
+        });
+
+        // Função do emoji automático
+        function obterIcone(categoria) {
+            const icones = { "Pizzas": "🍕", "Massas": "🍝", "Bebidas": "🥤", "Hambúrgueres": "🍔", "Sobremesas": "🍰", "Porções": "🍟" };
+            return icones[categoria] || "🍽️";
+        }
+
+        const listaProdutosUI = document.getElementById('lista-produtos');
+        const q = query(colecaoPratos, orderBy("dataCriacao", "desc"));
+
+        onSnapshot(q, (snapshot) => {
+            listaProdutosUI.innerHTML = ''; 
+            
+            if (snapshot.empty) {
+                listaProdutosUI.innerHTML = '<p style="color: var(--text-light); font-size: 0.9rem;">Nenhum prato cadastrado ainda.</p>';
+                return;
+            }
+
+            snapshot.forEach((documento) => {
+                const prato = documento.data();
+                const idDoPrato = documento.id; 
+                const precoFormatado = prato.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+                const miniaturaHTML = prato.imagem 
+                    ? `<img src="${prato.imagem}" class="mini-thumb" alt="Foto">` 
+                    : `<div class="mini-thumb">${obterIcone(prato.categoria)}</div>`;
+
+                const itemHTML = document.createElement('div');
+                itemHTML.className = 'product-list-item';
+                itemHTML.innerHTML = `
+                    <div class="prod-info-wrapper">
+                        ${miniaturaHTML}
+                        <div class="prod-info">
+                            <strong>${prato.nome}</strong>
+                            <span>${prato.categoria} • ${precoFormatado}</span>
+                        </div>
+                    </div>
+                    <button class="btn-delete" data-id="${idDoPrato}">Excluir</button>
+                `;
+                
+                listaProdutosUI.appendChild(itemHTML);
+            });
+
+            document.querySelectorAll('.btn-delete').forEach(botao => {
+                botao.addEventListener('click', async (e) => {
+                    const idParaDeletar = e.target.getAttribute('data-id');
+                    if(confirm("Tem certeza que deseja excluir este prato?")) {
+                        await deleteDoc(doc(db, "pratos_cantina", idParaDeletar));
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

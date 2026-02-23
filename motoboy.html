@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Entregador | 1bu Tech</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #6200ea;
+            --success: #10b981;
+            --bg: #f3f4f6;
+            --white: #ffffff;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body { 
+            background-color: var(--bg); 
+            color: var(--text-dark); 
+            display: flex; 
+            flex-direction: column; 
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        header {
+            background-color: var(--text-dark);
+            color: var(--white);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 { font-size: 1.2rem; font-weight: 800; letter-spacing: 1px; }
+
+        .container {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .info-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 16px;
+        }
+
+        .highlight-box {
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+            padding: 12px;
+            border-radius: 8px;
+            color: #b91c1c;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pin-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .pin-input {
+            width: 100%;
+            font-size: 2.5rem;
+            text-align: center;
+            letter-spacing: 15px;
+            padding: 15px;
+            border: 2px solid #d1d5db;
+            border-radius: 12px;
+            font-weight: 800;
+            color: var(--primary);
+            outline: none;
+            transition: 0.3s;
+            background: #f8fafc;
+        }
+
+        .pin-input:focus {
+            border-color: var(--primary);
+            background: var(--white);
+            box-shadow: 0 0 0 4px rgba(98, 0, 234, 0.1);
+        }
+
+        .btn-validate {
+            width: 100%;
+            padding: 18px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-top: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(98, 0, 234, 0.3);
+            transition: 0.2s;
+        }
+
+        .btn-validate:active {
+            transform: scale(0.96);
+        }
+
+        /* Telas de Estado */
+        #screen-loading, #screen-error, #screen-success {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #screen-error { display: none; color: #dc2626; }
+        #screen-success { display: none; color: var(--success); }
+        #screen-main { display: none; }
+
+        .icon-huge { font-size: 5rem; margin-bottom: 20px; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🛵 PORTAL DO ENTREGADOR</h1>
+    </header>
+
+    <div id="screen-loading">
+        <div class="icon-huge">⏳</div>
+        <h2>Buscando pedido...</h2>
+        <p style="color: var(--text-muted); margin-top: 10px;">Lendo os dados do QR Code.</p>
+    </div>
+
+    <div id="screen-error">
+        <div class="icon-huge">❌</div>
+        <h2 id="error-msg">Pedido não encontrado!</h2>
+        <p style="color: var(--text-muted); margin-top: 10px;">O QR Code pode ser inválido ou o pedido já foi cancelado.</p>
+    </div>
+
+    <div id="screen-success">
+        <div class="icon-huge">✅</div>
+        <h2>Entrega Concluída!</h2>
+        <p style="color: var(--text-muted); margin-top: 10px;">A base já foi notificada. Bom trabalho, motoca!</p>
+    </div>
+
+    <div id="screen-main" class="container">
+        
+        <div class="card">
+            <div class="section-title">📍 Endereço de Entrega</div>
+            <div class="info-text" id="display-endereco">Carregando endereço...</div>
+            
+            <div class="section-title">👤 Cliente</div>
+            <div class="info-text" id="display-cliente">Carregando cliente...</div>
+
+            <div class="highlight-box">
+                <span>Cobrar do Cliente:</span>
+                <span id="display-total" style="font-size: 1.2rem;">R$ 0,00</span>
+            </div>
+            
+            <div class="section-title">💳 Forma de Pagamento</div>
+            <div class="info-text" id="display-pagamento">Carregando...</div>
+        </div>
+
+        <div class="card pin-container">
+            <h3 style="color: var(--text-dark); margin-bottom: 10px;">Código de Segurança</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">Peça os 4 dígitos ao cliente para liberar a entrega.</p>
+            
+            <input type="tel" id="input-pin" class="pin-input" maxlength="4" placeholder="0000" autocomplete="off">
+            
+            <button class="btn-validate" id="btn-validar" onclick="validarEntrega()">Validar e Concluir ✔️</button>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // SUA CHAVE EXATA
+        const firebaseConfig = {
+            apiKey: "AIzaSyAB8wxPDhBhiX39dye_KvdapHUsDspbLsk",
+            authDomain: "mangiare-79f67.firebaseapp.com",
+            projectId: "mangiare-79f67",
+            storageBucket: "mangiare-79f67.firebasestorage.app",
+            messagingSenderId: "942988586703",
+            appId: "1:942988586703:web:b0a1ac8f0a9532e74e91ba"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let pedidoAtual = null;
+        let idPedidoURL = null;
+
+        // Pega o ID que veio no link do QR Code (ex: motoboy.html?id=ABC123XYZ)
+        const urlParams = new URLSearchParams(window.location.search);
+        idPedidoURL = urlParams.get('id');
+
+        async function carregarPedido() {
+            if(!idPedidoURL) {
+                mostrarErro("Nenhum código lido!");
+                return;
+            }
+
+            try {
+                const docRef = doc(db, "pedidos", idPedidoURL);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    pedidoAtual = docSnap.data();
+
+                    // Verifica se o pedido já foi entregue por engano
+                    if(pedidoAtual.status === 'concluido') {
+                        document.getElementById('screen-loading').style.display = 'none';
+                        document.getElementById('screen-success').style.display = 'flex';
+                        return;
+                    }
+
+                    // Preenche a tela do motoboy
+                    document.getElementById('display-endereco').innerText = pedidoAtual.endereco;
+                    document.getElementById('display-cliente').innerText = pedidoAtual.clienteNome;
+                    document.getElementById('display-total').innerText = pedidoAtual.total.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+                    document.getElementById('display-pagamento').innerText = pedidoAtual.pagamento;
+
+                    // Mostra a tela principal
+                    document.getElementById('screen-loading').style.display = 'none';
+                    document.getElementById('screen-main').style.display = 'flex';
+
+                } else {
+                    mostrarErro("Pedido não encontrado no sistema.");
+                }
+            } catch (error) {
+                console.error("Erro:", error);
+                mostrarErro("Erro de conexão. Verifique sua internet.");
+            }
+        }
+
+        function mostrarErro(msg) {
+            document.getElementById('screen-loading').style.display = 'none';
+            document.getElementById('screen-error').style.display = 'flex';
+            document.getElementById('error-msg').innerText = msg;
+        }
+
+        // Lógica de Validação quando clica no botão
+        window.validarEntrega = async function() {
+            const pinDigitado = document.getElementById('input-pin').value;
+            const btn = document.getElementById('btn-validar');
+
+            if(pinDigitado.length !== 4) {
+                alert("O código precisa ter 4 números.");
+                return;
+            }
+
+            // A MÁGICA: Compara o que o motoboy digitou com o PIN salvo oculto no Firebase
+            if(pinDigitado === pedidoAtual.codigoSeguranca) {
+                
+                btn.innerText = "Avisando a base... ⏳";
+                btn.disabled = true;
+
+                try {
+                    // Atualiza o banco para "concluido"
+                    await updateDoc(doc(db, "pedidos", idPedidoURL), {
+                        status: "concluido"
+                    });
+
+                    // Como mudou no banco, o gestor.html da loja vai ler isso e mover o cartão para a coluna "Entregue" sozinho!
+                    
+                    document.getElementById('screen-main').style.display = 'none';
+                    document.getElementById('screen-success').style.display = 'flex';
+
+                } catch(error) {
+                    alert("Erro ao validar. Tente novamente.");
+                    btn.innerText = "Validar e Concluir ✔️";
+                    btn.disabled = false;
+                }
+
+            } else {
+                alert("❌ Código Incorreto! Peça para o cliente olhar o código na tela de acompanhamento dele.");
+                document.getElementById('input-pin').value = ''; // Limpa para tentar de novo
+            }
+        }
+
+        // Inicia a busca assim que a tela abre
+        carregarPedido();
+
+    </script>
+</body>
+</html>
